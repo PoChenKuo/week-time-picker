@@ -6,7 +6,8 @@
     "WEEK_WED": "Wed",
     "WEEK_THU": "Thu",
     "WEEK_FRI": "Fri",
-    "WEEK_SAT": "Sat"
+    "WEEK_SAT": "Sat",
+    "TZ_HINT": "* All the timings listed are in your timezone: {city} ({timezone})"
   },
   "zh-tw": {
     "WEEK_SUN": "日",
@@ -15,6 +16,7 @@
     "WEEK_WED": "三",
     "WEEK_THU": "四",
     "WEEK_FRI": "五",
-    "WEEK_SAT": "六"
+    "WEEK_SAT": "六",
+    "TZ_HINT":"* 時間以 {city} ({timezone}) 顯示"
   }
 }

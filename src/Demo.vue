@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="title">
-      <span>{{$t("demo.welcome")}}</span>
+      <span>{{$t("demo.welcome") }}</span>
       <LangSwitch />
     </div>
 
@@ -26,6 +26,15 @@ export default {
 </script>
 
 <style lang="scss">
+html {
+  font-size: 16px;
+}
+body {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #484848;
+}
 #app {
   padding: 80px 0;
   width: 100%;

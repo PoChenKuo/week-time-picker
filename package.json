@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --host 107.174.206.104",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -12,6 +12,7 @@
     "element-ui": "^2.13.2",
     "vue": "^2.6.11",
     "vue-i18n": "^8.20.0",
+    "vue-moment": "^4.1.0",
     "vuex": "^3.5.1"
   },
   "devDependencies": {

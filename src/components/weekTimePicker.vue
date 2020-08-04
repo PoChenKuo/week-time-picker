@@ -2,27 +2,38 @@
   <div class="week-time-picker">
     <div class="schedule-title"></div>
     <div class="schedule-body">
-      <div class="control-box"></div>
-      <ScheduleWeekTable 
-      :begin-time="currentUTC" 
-      :week-start-time="localWeekStartValue"
+      <WeekTimePickerControl
+        :week-time-stamp="localWeekStartTimeStamp"
+        @callChangeWeek="changeDisplayWeek"
+      />
+
+      <ScheduleWeekTable
+        :booking-slot="{available,booked}"
+        :class="['week-table-entry']"
+        :week-start-time="localWeekStartTimeStamp"
       ></ScheduleWeekTable>
     </div>
   </div>
 </template>
 <script>
 import mockData from "../mockData";
-import { API_BookingUrl } from "../API_config";
 import ScheduleWeekTable from "./scheduleWeekTable";
+import WeekTimePickerControl from "./weekTimePickerControl";
+import { API_BookingUrl } from "../API_config";
+import { INTEGER_UNIT_PER_WEEK } from "../TimeConstant";
+
 export default {
   name: "WeekTimePicker",
-  components: { ScheduleWeekTable },
+  components: { ScheduleWeekTable, WeekTimePickerControl },
   data() {
     return {
       available: [],
       booked: [],
-      localWeekStartValue: 0,
-      currentUTC: 0
+      localWeekStartTimeStamp: 0,
+      cityName: Intl.DateTimeFormat()
+        .resolvedOptions()
+        .timeZone.replace(/^.*\//, "")
+        .toLowerCase()
     };
   },
   async created() {
@@ -30,15 +41,23 @@ export default {
   },
   mounted() {
     this.initialLocalTimeValue();
+    console.log(this);
   },
-  computed: {},
+  computed: {
+    timezoneLabel() {
+      const dt = new Date().toString().substring(25, 33);
+      return `${dt.slice(0, 6)}:${dt.slice(6, 8)}`;
+    }
+  },
   methods: {
+    changeDisplayWeek(multiplyOffset) {
+      this.localWeekStartTimeStamp += multiplyOffset * INTEGER_UNIT_PER_WEEK;
+    },
     initialLocalTimeValue() {
       const dt = new Date();
       dt.setHours(0, 0, 0, 0);
 
-      this.currentUTC = Date.now();
-      this.localWeekStartValue =
+      this.localWeekStartTimeStamp =
         dt.getTime() - dt.getDay() * 24 * 60 * 60 * 1000;
     },
     setupBookingData() {
@@ -52,11 +71,11 @@ export default {
           resolve(mockData);
         }
       }).then(bookingData => {
-        _this.convertFetchedBookingDataIntoLocal(bookingData);
+        _this.convertParsedDataIntoLocal(bookingData);
       });
     },
 
-    convertFetchedBookingDataIntoLocal(bookingData) {
+    convertParsedDataIntoLocal(bookingData) {
       const _this = this;
       const convertFunc = item => {
         return {
@@ -112,6 +131,10 @@ export default {
   width: 100%;
   .schedule-body {
     width: 100%;
+  }
+
+  .week-table-entry {
+    padding: 15px 0;
   }
 }
 </style>

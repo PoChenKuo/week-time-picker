@@ -1,29 +1,91 @@
 <template>
   <div class="schedule-week-table">
-    <!-- v-for -->
-    <div class="week-day-column" v-for="(dayItem, ind) in dayLable" :key="ind">
+    <div
+      class="week-day-column"
+      v-for="(dayItem, ind) in weekDayEntries"
+      :key="ind"
+      :class="{disabled:dayItem.disabled}"
+    >
       <div class="column-container">
         <div class="label-box">
-          <span class="day-label">{{$t(`calendar.${dayItem}`)}}</span>
+          <span class="day-label">{{$t(`calendar.${dayItem.dayLabel}`)}}</span>
           <br />
-          <span class="date-label"></span>
+          <span class="date-label">{{dayItem.dateInMonth}}</span>
         </div>
 
-        <!-- v-for -->
-        <div class="time-slot-list">
-          <div class="time-entry"></div>
-        </div>
+        <TimePeriodSlot :begin-time="dayItem.timeValue" :slot-range="dayItem.relatedSlots" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { INTEGER_UNIT_PER_DATE } from "../TimeConstant";
+import TimePeriodSlot from "./timePeriodSlot";
 export default {
   name: "ScheduleWeekTable",
+  props: {
+    weekStartTime: { type: Number, required: true, default: () => 0 },
+    bookingSlot: {
+      type: Object,
+      required: true,
+      default: () => {
+        return { available: [], booked: [] };
+      }
+    }
+  },
+  components: { TimePeriodSlot },
+  computed: {
+    dayRangeInWeek() {
+      let days = [];
+      for (let offset = 0; offset < 7; offset++) {
+        days.push(this.weekStartTime + offset * INTEGER_UNIT_PER_DATE);
+      }
+
+      return days.map(day => {
+        return new Date(day)
+          .getDate()
+          .toString()
+          .padStart(2, "0");
+      });
+    },
+    weekDayEntries() {
+      const _this = this;
+      const dayEntries = new Array(7).fill(null).map((item, ind) => {
+        const timeStampOffset =
+          _this.weekStartTime + ind * INTEGER_UNIT_PER_DATE;
+        const lastTimeBeforeNextDate = timeStampOffset + INTEGER_UNIT_PER_DATE;
+
+        const relatedFilter = slot => {
+          return (
+            (slot.start >= timeStampOffset &&
+              slot.end <= lastTimeBeforeNextDate) ||
+            (slot.end > timeStampOffset && slot.start < timeStampOffset)
+          );
+        };
+
+        const relatedSlots = {
+          available: _this.bookingSlot.available.filter(slot =>
+            relatedFilter(slot)
+          ),
+          booked: _this.bookingSlot.booked.filter(slot => relatedFilter(slot))
+        };
+
+        return {
+          dayLabel: _this.dayLabel[ind],
+          dateInMonth: _this.dayRangeInWeek[ind],
+          timeValue: timeStampOffset,
+          disabled: _this.currentTime >= lastTimeBeforeNextDate,
+          relatedSlots
+        };
+      });
+      return dayEntries;
+    }
+  },
   data() {
     return {
-      dayLable: [
+      currentTime: Date.now(),
+      dayLabel: [
         "WEEK_SUN",
         "WEEK_MON",
         "WEEK_TUE",
@@ -33,7 +95,9 @@ export default {
         "WEEK_SAT"
       ]
     };
-  }
+  },
+
+  mounted() {}
 };
 </script>
 
@@ -55,10 +119,6 @@ export default {
       .label-box {
         padding: 10px 0;
         text-align: center;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
-        color: #484848;
       }
     }
     &.disabled > .column-container {

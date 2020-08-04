@@ -1,0 +1,20 @@
+{
+  "us-en": {
+    "WEEK_SUN": "Sun",
+    "WEEK_MON": "Mon",
+    "WEEK_TUE": "Tue",
+    "WEEK_WED": "Wed",
+    "WEEK_THU": "Thu",
+    "WEEK_FRI": "Fri",
+    "WEEK_SAT": "Sat"
+  },
+  "zh-tw": {
+    "WEEK_SUN": "日",
+    "WEEK_MON": "一",
+    "WEEK_TUE": "二",
+    "WEEK_WED": "三",
+    "WEEK_THU": "四",
+    "WEEK_FRI": "五",
+    "WEEK_SAT": "六"
+  }
+}

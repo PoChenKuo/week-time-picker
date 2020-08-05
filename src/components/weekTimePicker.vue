@@ -10,7 +10,7 @@
       <ScheduleWeekTable
         :booking-slot="{available,booked}"
         :class="['week-table-entry']"
-        :week-start-time="localWeekStartTimeStamp"
+        :start-time-of-week="localWeekStartTimeStamp"
       ></ScheduleWeekTable>
     </div>
   </div>
@@ -36,12 +36,10 @@ export default {
         .toLowerCase()
     };
   },
-  async created() {
-    this.setupBookingData();
-  },
+
   mounted() {
     this.initialLocalTimeValue();
-    console.log(this);
+    this.setupBookingData();
   },
   computed: {
     timezoneLabel() {
@@ -50,9 +48,6 @@ export default {
     }
   },
   methods: {
-    changeDisplayWeek(multiplyOffset) {
-      this.localWeekStartTimeStamp += multiplyOffset * INTEGER_UNIT_PER_WEEK;
-    },
     initialLocalTimeValue() {
       const dt = new Date();
       dt.setHours(0, 0, 0, 0);
@@ -107,6 +102,9 @@ export default {
         },
         bookingData
       );
+    },
+    changeDisplayWeek(multiplyOffset) {
+      this.localWeekStartTimeStamp += multiplyOffset * INTEGER_UNIT_PER_WEEK;
     },
     convertUTCStringToValue(UTCDate) {
       const itemSplitArray = UTCDate.split(/-|:|T|Z/)

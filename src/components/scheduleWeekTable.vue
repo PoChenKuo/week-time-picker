@@ -25,7 +25,7 @@ import TimePeriodSlot from "./timePeriodSlot";
 export default {
   name: "ScheduleWeekTable",
   props: {
-    weekStartTime: { type: Number, required: true, default: () => 0 },
+    startTimeOfWeek: { type: Number, required: true, default: () => 0 },
     bookingSlot: {
       type: Object,
       required: true,
@@ -39,7 +39,7 @@ export default {
     dayRangeInWeek() {
       let days = [];
       for (let offset = 0; offset < 7; offset++) {
-        days.push(this.weekStartTime + offset * INTEGER_UNIT_PER_DATE);
+        days.push(this.startTimeOfWeek + offset * INTEGER_UNIT_PER_DATE);
       }
 
       return days.map(day => {
@@ -52,15 +52,17 @@ export default {
     weekDayEntries() {
       const _this = this;
       const dayEntries = new Array(7).fill(null).map((item, ind) => {
-        const timeStampOffset =
-          _this.weekStartTime + ind * INTEGER_UNIT_PER_DATE;
-        const lastTimeBeforeNextDate = timeStampOffset + INTEGER_UNIT_PER_DATE;
+        const startTimeOfDayInWeek =
+          _this.startTimeOfWeek + ind * INTEGER_UNIT_PER_DATE;
+        const lastTimeBeforeNextDate =
+          startTimeOfDayInWeek + INTEGER_UNIT_PER_DATE;
 
         const relatedFilter = slot => {
           return (
-            (slot.start >= timeStampOffset &&
-              slot.end <= lastTimeBeforeNextDate) ||
-            (slot.end > timeStampOffset && slot.start < timeStampOffset)
+            (slot.start >= startTimeOfDayInWeek &&
+              slot.start < lastTimeBeforeNextDate) ||
+            (slot.end >= startTimeOfDayInWeek &&
+              slot.start <= startTimeOfDayInWeek)
           );
         };
 
@@ -74,7 +76,7 @@ export default {
         return {
           dayLabel: _this.dayLabel[ind],
           dateInMonth: _this.dayRangeInWeek[ind],
-          timeValue: timeStampOffset,
+          timeValue: startTimeOfDayInWeek,
           disabled: _this.currentTime >= lastTimeBeforeNextDate,
           relatedSlots
         };

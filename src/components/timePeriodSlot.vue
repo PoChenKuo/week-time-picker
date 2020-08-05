@@ -11,8 +11,8 @@
 
 <script>
 import {
-  INTEGER_UNIT_PER_30_MIN
-  // INTEGER_UNIT_PER_DATE
+  INTEGER_UNIT_PER_30_MIN,
+  INTEGER_UNIT_PER_DATE
 } from "../TimeConstant";
 export default {
   name: "TimePeriodSlot",
@@ -31,10 +31,31 @@ export default {
   },
   computed: {
     timeSlots() {
-      const slots = [...this.parseSlotRanges(this.slotRange)];
-      return slots
-        .sort((a, b) => a.timeValue - b.timeValue)
-        .filter(slot => slot.timeValue > Date.now());
+      const _this = this;
+      const timeOfDayFinish =
+        new Date(_this.beginTime).setHours(0, 0, 0, 0) + INTEGER_UNIT_PER_DATE;
+
+      let slots = [...this.parseSlotRanges(this.slotRange)];
+      if (slots.length === 0) return [];
+      slots = slots
+        .filter(slot => {
+          console.log(
+            `${slot.timeValue} / ${new Date(slot.timeValue).toString()}\n`,
+            `${new Date(_this.beginTime).toString()} / ${new Date(
+              timeOfDayFinish
+            ).toString()}\n`,
+            slot.timeValue > _this.beginTime &&
+              slot.timeValue > Date.now() &&
+              slot.timeValue < timeOfDayFinish
+          );
+          return (
+            slot.timeValue > _this.beginTime &&
+            slot.timeValue > Date.now() &&
+            slot.timeValue < timeOfDayFinish
+          );
+        })
+        .sort((a, b) => a.timeValue - b.timeValue);
+      return slots;
     }
   },
   data() {

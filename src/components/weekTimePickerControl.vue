@@ -14,7 +14,7 @@
     </div>
     <div
       class="week-range-display"
-    >{{weekTimeStamp|moment('YYYY/MM/DD')}} - {{weekTimeStamp| moment("add", "7 days",'DD')}}</div>
+    >{{(weekTimeStamp||0)|moment('YYYY/MM/DD')}} - {{(weekTimeStamp||0)| moment("add", "7 days",'DD')}}</div>
     <div
       class="timezone-display"
     >{{$t('calendar.TZ_HINT',{timezone:timezoneLabel, city:$t(`city.${cityName}`)})}}</div>

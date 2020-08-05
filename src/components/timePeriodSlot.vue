@@ -19,7 +19,9 @@ export default {
   props: {
     beginTime: {
       require: true,
-      default: () => Date.now().setHours(0, 0, 0, 0)
+      default: () => {
+        return new Date().setHours(0, 0, 0, 0);
+      }
     },
     slotRange: {
       type: Object,
@@ -37,7 +39,7 @@ export default {
     },
     timeSlots() {
       const _this = this;
-      const slotRange = this.convertSlotRangesIntoDayPeroid(this.slotRange);
+      const slotRange = this.convertSlotRangesIntoDayPeriod(this.slotRange);
       let slots = [...this.parseSlotRangesIntoFormattedType(slotRange)];
       if (slots.length === 0) return [];
       slots = slots
@@ -75,7 +77,7 @@ export default {
 
       return slots;
     },
-    convertSlotRangesIntoDayPeroid({ available, booked }) {
+    convertSlotRangesIntoDayPeriod({ available, booked }) {
       const _this = this;
       const rangeConverter = slot => {
         return {
@@ -85,8 +87,8 @@ export default {
         };
       };
       return {
-        available: available.map(slot=>rangeConverter(slot)),
-        booked: booked.map(slot=>rangeConverter(slot)) 
+        available: available.map(slot => rangeConverter(slot)),
+        booked: booked.map(slot => rangeConverter(slot))
       };
     },
     parseSlotRangesIntoFormattedType({ available, booked }) {

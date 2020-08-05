@@ -30,28 +30,22 @@ export default {
     }
   },
   computed: {
+    timeOfDayFinish() {
+      return (
+        new Date(this.beginTime).setHours(0, 0, 0, 0) + INTEGER_UNIT_PER_DATE
+      );
+    },
     timeSlots() {
       const _this = this;
-      const timeOfDayFinish =
-        new Date(_this.beginTime).setHours(0, 0, 0, 0) + INTEGER_UNIT_PER_DATE;
-
-      let slots = [...this.parseSlotRanges(this.slotRange)];
+      const slotRange = this.convertSlotRangesIntoDayPeroid(this.slotRange);
+      let slots = [...this.parseSlotRangesIntoFormattedType(slotRange)];
       if (slots.length === 0) return [];
       slots = slots
         .filter(slot => {
-          console.log(
-            `${slot.timeValue} / ${new Date(slot.timeValue).toString()}\n`,
-            `${new Date(_this.beginTime).toString()} / ${new Date(
-              timeOfDayFinish
-            ).toString()}\n`,
-            slot.timeValue > _this.beginTime &&
-              slot.timeValue > Date.now() &&
-              slot.timeValue < timeOfDayFinish
-          );
           return (
             slot.timeValue > _this.beginTime &&
             slot.timeValue > Date.now() &&
-            slot.timeValue < timeOfDayFinish
+            slot.timeValue < _this.timeOfDayFinish
           );
         })
         .sort((a, b) => a.timeValue - b.timeValue);
@@ -81,14 +75,28 @@ export default {
 
       return slots;
     },
-    parseSlotRanges({ available, booked }) {
-      if (!(available.length || booked.length)) return [];
+    convertSlotRangesIntoDayPeroid({ available, booked }) {
+      const _this = this;
+      const rangeConverter = slot => {
+        return {
+          start: slot.start < _this.beginTime ? _this.beginTime : slot.start,
+          end:
+            slot.end > _this.timeOfDayFinish ? _this.timeOfDayFinish : slot.end
+        };
+      };
+      return {
+        available: available.map(slot=>rangeConverter(slot)),
+        booked: booked.map(slot=>rangeConverter(slot)) 
+      };
+    },
+    parseSlotRangesIntoFormattedType({ available, booked }) {
       const slotAvailbleSet = (slot, isAvailable) => {
         return {
           timeValue: slot.timeValue,
           available: isAvailable
         };
       };
+      if (!(available.length || booked.length)) return [];
       const parsedAvailable = this.splitSlotRange(available).map(slot =>
         slotAvailbleSet(slot, true)
       );

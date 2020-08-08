@@ -25,6 +25,20 @@ import { INTEGER_UNIT_PER_WEEK } from "../TimeConstant";
 export default {
   name: "WeekTimePicker",
   components: { ScheduleWeekTable, WeekTimePickerControl },
+  props: {
+    demoInput: {
+      require: false,
+      type: Object,
+      default: () => null
+    }
+  },
+  watch: {
+    demoInput(nv) {
+      if (nv !== null) {
+        this.convertParsedDataIntoLocal(nv)      
+      }
+    }
+  },
   data() {
     return {
       available: [],
